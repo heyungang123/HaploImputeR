@@ -1,0 +1,384 @@
+%\VignetteIndexEntry{HaploImputeR Tutorial}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
+
+---
+title: "HaploImputeR Tutorial"
+author: "HaploImputeR Authors"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{HaploImputeR Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+# Introduction
+
+**HaploImputeR** is an R package designed for haplotype imputation and synthetic haplotype generation. It uses Lasso regression and probabilistic methods to generate synthetic haplotypes based on reference population data while preserving allele frequency constraints.
+
+## Key Features
+
+- Generate synthetic haplotypes that match target population allele frequencies
+- Support for dynamic window sizes based on local LD (Linkage Disequilibrium) structure
+- Parallel processing capability for large datasets
+- Reproducible results through random seed control
+- Comprehensive input validation and error handling
+
+## Installation
+
+```r
+# Install from source
+install.packages("path/to/HaploImputeR", repos = NULL, type = "source")
+```
+
+# Quick Start
+
+## Basic Workflow
+
+The typical workflow consists of three main steps:
+
+1. **Prepare reference haplotype data** from a reference population
+2. **Calculate allele counts** for the target population
+3. **Generate synthetic haplotypes** using one of the generator functions
+
+## Example: Generate Synthetic Haplotypes
+
+```r
+library(HaploImputeR)
+
+# Create example reference population (sites x chromosomes)
+set.seed(42)
+hap_ref <- matrix(sample(0:1, 1000, replace = TRUE), nrow = 100, ncol = 10)
+
+# Define target population allele counts
+# Each row: [count of allele 0, count of allele 1]
+count_obj <- matrix(c(5, 5), nrow = 100, ncol = 2)
+
+# Generate synthetic haplotypes
+simu_hap <- twinsGenerator(
+  haplotype_ref = hap_ref,
+  count_alleles_obj = count_obj,
+  seed_size = 10,
+  batch_size = 2,
+  prior_window_size = 50,
+  seed = 42
+)
+
+# Check results
+dim(simu_hap)  # Should be 100 x 10
+```
+
+# Main Functions
+
+## Core Functions
+
+### 1. twinsGenerator()
+
+Generate synthetic haplotypes with automatic seed generation. This function automatically creates initial haplotype seeds and extends them using Lasso-based probabilistic imputation.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `haplotype_ref` | matrix | Reference population haplotype matrix (sites × chromosomes) |
+| `count_alleles_obj` | matrix | Target population allele count matrix (sites × 2) |
+| `seed_size` | integer | Number of initial sites for seed generation |
+| `batch_size` | integer | Sites per extension step (recommended: 2) |
+| `prior_window_size` | integer | Window size for prior reference |
+| `seed` | numeric | Random seed for reproducibility (default: NULL) |
+| `verbose` | logical | Print progress messages (default: TRUE) |
+| `check_values` | logical | Validate input contains only 0/1 (default: FALSE) |
+
+**Example:**
+
+```r
+result <- twinsGenerator(
+  haplotype_ref = reference_haplotypes,
+  count_alleles_obj = target_counts,
+  seed_size = 20,
+  batch_size = 2,
+  prior_window_size = 200,
+  seed = 123,
+  verbose = TRUE
+)
+```
+
+### 2. twinsGeneratorM()
+
+Generate synthetic haplotypes using externally provided haplotype seeds. Useful when initial haplotype patterns need to be controlled.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `haplotype_ref` | matrix | Reference population haplotype matrix |
+| `haploSeeds_obj` | matrix | Initial haplotype seeds matrix |
+| `count_alleles_obj` | matrix | Target population allele counts |
+| `batch_size` | integer | Sites per extension step |
+| `prior_window_size` | integer | Window size for prior reference |
+| `seed` | numeric | Random seed (default: NULL) |
+| `verbose` | logical | Print progress (default: TRUE) |
+| `check_values` | logical | Validate 0/1 values (default: FALSE) |
+
+**Example:**
+
+```r
+# Create custom seeds
+seeds <- matrix(sample(0:1, 200, replace = TRUE), nrow = 10, ncol = 20)
+
+result <- twinsGeneratorM(
+  haplotype_ref = reference_haplotypes,
+  haploSeeds_obj = seeds,
+  count_alleles_obj = target_counts,
+  batch_size = 2,
+  prior_window_size = 200,
+  seed = 42
+)
+```
+
+### 3. twinsGeneratorRD()
+
+Generate synthetic haplotypes using dynamic window sizes that adapt based on local LD structure.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `haplotype_ref` | matrix | Reference population haplotype matrix |
+| `haploSeeds_obj` | matrix | Initial haplotype seeds matrix |
+| `count_alleles_obj` | matrix | Target population allele counts |
+| `batch_size` | integer | Sites per extension step |
+| `prior_window_size` | vector | Window sizes for each site |
+| `seed` | numeric | Random seed (default: NULL) |
+| `verbose` | logical | Print progress (default: TRUE) |
+| `check_values` | logical | Validate 0/1 values (default: FALSE) |
+
+**Example:**
+
+```r
+# Calculate dynamic window sizes
+win_sizes <- winSizeR2(haplotype_ref, thresHold = 0.05, sizeMax = 500, sizeBias = 200)
+
+result <- twinsGeneratorRD(
+  haplotype_ref = reference_haplotypes,
+  haploSeeds_obj = seeds,
+  count_alleles_obj = target_counts,
+  batch_size = 2,
+  prior_window_size = win_sizes,
+  seed = 42
+)
+```
+
+## Supporting Functions
+
+### haploSeeds()
+
+Generate initial haplotype seeds based on reference population frequency distribution.
+
+```r
+seeds <- haploSeeds(
+  haplotype_Y_train = training_haplotypes,
+  count_alleles = allele_counts,
+  seed = 42,
+  check_values = FALSE
+)
+```
+
+### probComputationM()
+
+Compute haplotype probability matrix using multinomial Lasso regression.
+
+```r
+prob_matrix <- probComputationM(
+  haplotype_Y_ref = haplotype_types,
+  haplotype_X_ref = training_sites,
+  haplotype_X_prior = prior_sites,
+  alpha = 1,
+  check_values = FALSE
+)
+```
+
+### imputedHaplo2ExactC()
+
+Generate haplotypes from probability matrix while ensuring exact allele counts.
+
+```r
+imputed <- imputedHaplo2ExactC(
+  haplotype_Y_ref = haplotype_types,
+  haplotype_Prob = probability_matrix,
+  count_alleles = allele_counts,
+  seed = 42,
+  check_values = FALSE
+)
+```
+
+### winSizeR2()
+
+Calculate adaptive window size based on local LD structure.
+
+```r
+win_sizes <- winSizeR2(
+  haplotype = haplotype_data,
+  thresHold = 0.05,
+  sizeMax = 500,
+  sizeBias = 200,
+  parallel = FALSE,
+  n_workers = NULL,
+  seed = NULL,
+  check_values = FALSE
+)
+```
+
+### calculateLD()
+
+Calculate pairwise LD r-squared value between two SNPs.
+
+```r
+ld_value <- calculateLD(
+  LD_data = snp_pair_matrix  # Two-column matrix
+)
+```
+
+# Advanced Usage
+
+## Parallel Processing
+
+For large datasets, enable parallel processing in `winSizeR2()`:
+
+```r
+# Use parallel processing
+win_sizes <- winSizeR2(
+  haplotype = large_haplotype_data,
+  thresHold = 0.05,
+  sizeMax = 500,
+  sizeBias = 200,
+  parallel = TRUE,
+  n_workers = 4
+)
+```
+
+## Input Validation
+
+Enable strict input validation to ensure data integrity:
+
+```r
+result <- twinsGenerator(
+  haplotype_ref = hap_ref,
+  count_alleles_obj = counts,
+  seed_size = 10,
+  batch_size = 2,
+  prior_window_size = 50,
+  check_values = TRUE  # Validate 0/1 values
+)
+```
+
+## Reproducibility
+
+Always set a seed for reproducible results:
+
+```r
+# Same seed produces identical results
+result1 <- twinsGenerator(hap_ref, counts, 10, 2, 50, seed = 42)
+result2 <- twinsGenerator(hap_ref, counts, 10, 2, 50, seed = 42)
+identical(result1, result2)  # TRUE
+```
+
+# Data Format Requirements
+
+## Haplotype Matrices
+
+- **Format**: Matrix with values 0 or 1
+- **Dimensions**: Sites (rows) × Chromosomes (columns)
+- **Example**: 100 sites × 1000 chromosomes
+
+```r
+# Create a valid haplotype matrix
+hap_matrix <- matrix(sample(0:1, 100000, replace = TRUE), nrow = 100, ncol = 1000)
+```
+
+## Allele Count Matrices
+
+- **Format**: Matrix with 2 columns
+- **Column 1**: Count of allele 0
+- **Column 2**: Count of allele 1
+- **Rows**: One per site
+
+```r
+# Create allele count matrix
+count_matrix <- matrix(c(50, 50, 40, 60, 55, 45), nrow = 3, ncol = 2, byrow = TRUE)
+# Site 1: 50 zeros, 50 ones
+# Site 2: 40 zeros, 60 ones
+# Site 3: 55 zeros, 45 ones
+```
+
+# Algorithm Details
+
+## Lasso-Based Probability Estimation
+
+The package uses multinomial Lasso regression to estimate haplotype probabilities:
+
+1. Extract unique haplotype patterns from reference data
+2. Train a Lasso model using prior site information
+3. Predict probabilities for target haplotypes
+
+## Exact Allele Count Matching
+
+The `imputedHaplo2ExactC()` function ensures exact allele count matching through:
+
+1. Entropy-based ordering of sites
+2. Sequential chromosome assignment
+3. Dynamic probability adjustment
+
+## Dynamic Window Size
+
+The `winSizeR2()` function calculates adaptive window sizes:
+
+1. Computes R² between current site and prior sites
+2. Counts sites exceeding threshold
+3. Returns window size with bias adjustment
+
+# Troubleshooting
+
+## Common Issues
+
+### 1. Convergence Warnings
+
+If you see warnings like "Convergence for Xth lambda value not reached", this is normal for glmnet with large datasets. Results are still valid.
+
+### 2. Memory Issues
+
+For very large datasets:
+- Reduce `prior_window_size`
+- Process in smaller batches
+- Use parallel processing for `winSizeR2()`
+
+### 3. Dimension Mismatch
+
+Ensure:
+- `count_alleles_obj` rows match `haplotype_ref` rows
+- `haploSeeds_obj` columns match `sum(count_alleles_obj[1,])`
+
+# References
+
+The algorithms implemented in this package are based on Lasso regression methods for haplotype imputation and probabilistic models for synthetic population generation.
+
+# Version History
+
+- **0.1.0**: Initial release
+  - Core haplotype generation functions
+  - LD calculation utilities
+  - Parallel processing support
+  - Reproducibility features

@@ -1,0 +1,58 @@
+url: https://yourusername.github.io/HaploImputeR/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+        - text: Tutorial
+          href: articles/HaploImputeR-tutorial.html
+
+reference:
+  - title: Main Functions
+    desc: Core haplotype generation functions
+    contents:
+      - twinsGenerator
+      - twinsGeneratorM
+      - twinsGeneratorRD
+
+  - title: Supporting Functions
+    desc: Helper functions for haplotype operations
+    contents:
+      - haploSeeds
+      - probComputationM
+      - imputedHaplo2ExactC
+
+  - title: Utility Functions
+    desc: Utility functions for LD calculations
+    contents:
+      - winSizeR2
+      - calculateLD
+
+articles:
+  - title: Getting Started
+    navbar: ~
+    contents:
+      - HaploImputeR-tutorial
+
+figures:
+  dev: grDevices::png
+  dpi: 96
+  dev.args: []
+  fig.ext: png
+  fig.width: 7
+  fig.height: ~
+  fig.retina: 2
+  fig.asp: 1/1.618
+  bg: NA
+  other.parameters: []
+
+development:
+  mode: auto

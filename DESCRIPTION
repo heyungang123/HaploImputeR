@@ -1,0 +1,29 @@
+Package: HaploImputeR
+Type: Package
+Title: Haplotype Imputation and Generation Tools
+Version: 0.1.0
+Authors@R: c(
+    person("Your", "Name", email = "your.email@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+  )
+Description: Tools for haplotype imputation and generation using
+    Lasso regression and probabilistic methods. This package provides
+    functions to generate synthetic haplotypes based on reference
+    population data while preserving allele frequency constraints.
+    Includes support for dynamic window sizes based on LD structure,
+    parallel processing for large datasets, and reproducible results
+    through random seed control.
+License: MIT + file LICENSE
+URL: https://github.com/yourusername/HaploImputeR
+BugReports: https://github.com/yourusername/HaploImputeR/issues
+Depends: R (>= 3.5.0)
+Imports: glmnet
+Suggests: 
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    parallel
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
