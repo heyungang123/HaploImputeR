@@ -1,8 +1,8 @@
 # HaploImputeR
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/yourusername/HaploImputeR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/HaploImputeR/actions/workflows/R-CMD-check.yaml)
-[![Test Coverage](https://github.com/yourusername/HaploImputeR/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/yourusername/HaploImputeR/actions/workflows/test-coverage.yaml)
+[![R-CMD-check](https://github.com/heyungang123/HaploImputeR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/heyungang123/HaploImputeR/actions/workflows/R-CMD-check.yaml)
+[![Test Coverage](https://github.com/heyungang123/HaploImputeR/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/heyungang123/HaploImputeR/actions/workflows/test-coverage.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CRAN status](https://www.r-pkg.org/badges/version/HaploImputeR)](https://CRAN.R-project.org/package=HaploImputeR)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -34,7 +34,7 @@ install.packages("HaploImputeR")
 
 ```r
 # install.packages("devtools")
-devtools::install_github("yourusername/HaploImputeR")
+devtools::install_github("heyungang123/HaploImputeR")
 ```
 
 ### Dependencies
@@ -114,10 +114,10 @@ If you use HaploImputeR in your research, please cite:
 ```bibtex
 @Manual{HaploImputeR,
   title = {HaploImputeR: Haplotype Imputation and Generation Tools},
-  author = {Your Name},
+  author = {YUQI CHEN and YUNGANG HE},
   year = {2024},
   note = {R package version 0.1.0},
-  url = {https://github.com/yourusername/HaploImputeR},
+  url = {https://github.com/heyungang123/HaploImputeR},
 }
 ```
 
@@ -127,5 +127,5 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ## Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/HaploImputeR/issues)
-- **Email**: your.email@example.com
+- **Issues**: [GitHub Issues](https://github.com/heyungang123/HaploImputeR/issues)
+- **Email**: 625108562@qq.com
