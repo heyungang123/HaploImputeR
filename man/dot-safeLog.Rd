@@ -12,3 +12,4 @@
 \description{
 Compute log with protection against zero values
 }
+\keyword{internal}

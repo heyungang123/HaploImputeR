@@ -12,3 +12,4 @@
 \description{
 Convert unique result to matrix if dimension degenerates
 }
+\keyword{internal}

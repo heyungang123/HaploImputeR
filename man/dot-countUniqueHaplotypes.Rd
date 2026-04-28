@@ -17,3 +17,4 @@ Vector of counts for each unique haplotype
 \description{
 Count occurrences of each unique haplotype pattern
 }
+\keyword{internal}

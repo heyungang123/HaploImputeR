@@ -19,3 +19,4 @@ Sliced matrix
 \description{
 Internal function to safely slice haplotype matrices
 }
+\keyword{internal}

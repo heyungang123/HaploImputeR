@@ -19,3 +19,4 @@ Matrix representation of input
 \description{
 Check input matrix validity, enforce matrix type, and validate values
 }
+\keyword{internal}

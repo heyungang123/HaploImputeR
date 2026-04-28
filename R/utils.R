@@ -4,6 +4,7 @@
 #' @param start_idx Start index
 #' @param end_idx End index
 #' @return Sliced matrix
+#' @keywords internal
 .sliceHaplotype <- function(haplotype, start_idx, end_idx) {
   start_idx <- max(1, start_idx)
   end_idx <- min(nrow(haplotype), end_idx)
@@ -19,6 +20,7 @@
 #' @param name Object name for error message
 #' @param check_values Whether to check for 0/1 values (default: FALSE)
 #' @return Matrix representation of input
+#' @keywords internal
 .validateInput <- function(x, name = "input", check_values = FALSE) {
   if (!is.matrix(x) && !is.data.frame(x)) {
     stop(paste0(name, " must be a matrix or data.frame"))
@@ -41,6 +43,7 @@
 #' @title Handle unique haplotype dimension issue
 #' @description Convert unique result to matrix if dimension degenerates
 #' @param unique_haplo Unique haplotype result
+#' @keywords internal
 .handleUniqueDim <- function(unique_haplo) {
   if (is.null(dim(unique_haplo))) {
     unique_haplo <- matrix(unique_haplo, nrow = 1, ncol = length(unique_haplo))
@@ -51,6 +54,7 @@
 #' @title Safe log computation
 #' @description Compute log with protection against zero values
 #' @param x Input values
+#' @keywords internal
 .safeLog <- function(x) {
   log(pmax(x, .Machine$double.eps))
 }
@@ -59,6 +63,7 @@
 #' @description Division with protection against zero denominator
 #' @param numerator Numerator
 #' @param denominator Denominator
+#' @keywords internal
 .safeDivide <- function(numerator, denominator) {
   if (denominator == 0) return(0)
   numerator / denominator
@@ -67,6 +72,7 @@
 #' @title Sort unique haplotypes
 #' @description Sort unique haplotypes by site values
 #' @param unique_haplo Unique haplotype matrix
+#' @keywords internal
 .sortUniqueHaplotypes <- function(unique_haplo) {
   num_site <- nrow(unique_haplo)
   if (num_site == 1) return(unique_haplo)
@@ -81,6 +87,7 @@
 #' @param haplotype_Y_train Training haplotype matrix
 #' @param unique_haplotype Unique haplotype patterns
 #' @return Vector of counts for each unique haplotype
+#' @keywords internal
 .countUniqueHaplotypes <- function(haplotype_Y_train, unique_haplotype) {
   num_site <- nrow(unique_haplotype)
   num_unique <- ncol(unique_haplotype)
@@ -102,6 +109,7 @@
 #' @title Set random seed safely
 #' @description Set random seed if provided, ensuring reproducibility
 #' @param seed Random seed value (NULL means no seed set)
+#' @keywords internal
 .setSeedIfProvided <- function(seed) {
   if (!is.null(seed)) {
     if (!is.numeric(seed) || length(seed) != 1 || seed < 0) {
@@ -113,6 +121,10 @@
 
 #' @title Check parallel package availability
 #' @description Check if parallel processing is available and valid
+#' @param parallel Logical, whether parallel processing is requested
+#' @param n_workers Number of workers for parallel processing
+#' @return Logical indicating if parallel processing is available
+#' @keywords internal
 .checkParallelAvailable <- function(parallel, n_workers) {
   if (!parallel) return(FALSE)
   if (!requireNamespace("parallel", quietly = TRUE)) {

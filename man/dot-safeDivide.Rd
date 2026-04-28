@@ -14,3 +14,4 @@
 \description{
 Division with protection against zero denominator
 }
+\keyword{internal}

@@ -6,6 +6,15 @@
 \usage{
 .checkParallelAvailable(parallel, n_workers)
 }
+\arguments{
+\item{parallel}{Logical, whether parallel processing is requested}
+
+\item{n_workers}{Number of workers for parallel processing}
+}
+\value{
+Logical indicating if parallel processing is available
+}
 \description{
 Check if parallel processing is available and valid
 }
+\keyword{internal}

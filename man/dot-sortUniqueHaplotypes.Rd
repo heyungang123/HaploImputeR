@@ -12,3 +12,4 @@
 \description{
 Sort unique haplotypes by site values
 }
+\keyword{internal}
