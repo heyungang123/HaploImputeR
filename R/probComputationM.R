@@ -39,6 +39,7 @@
 #' \code{\link{imputedHaplo2ExactC}} which uses the probability matrix\cr
 #' \code{\link[glmnet]{glmnet}} for the underlying Lasso implementation
 #'
+#' @importFrom stats predict
 #' @export
 #'
 #' @examples

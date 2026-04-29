@@ -37,6 +37,7 @@
 #' \code{\link{twinsGeneratorRD}} which uses dynamic window sizes\cr
 #' \code{\link{calculateLD}} for pairwise LD calculation
 #'
+#' @importFrom stats cor
 #' @export
 #'
 #' @examples
@@ -80,6 +81,10 @@ winSizeR2 <- function(haplotype, thresHold = 0.05, sizeMax = 500, sizeBias = 200
   
   result <- matrix(0, nrow = num_site, ncol = 1)
   
+  if (num_site <= 1) {
+    return(result)
+  }
+  
   use_parallel <- .checkParallelAvailable(parallel, if(is.null(n_workers)) 1 else n_workers)
   
   if (use_parallel) {
@@ -88,32 +93,48 @@ winSizeR2 <- function(haplotype, thresHold = 0.05, sizeMax = 500, sizeBias = 200
     }
     n_workers <- min(n_workers, num_site - 1)
     
-    site_indices <- 2:num_site
-    
-    cor_func <- function(i) {
-      site_start <- max(1, i - sizeMax)
-      site_end <- i - 1
-      
-      site_current <- haplotype[i, , drop = TRUE]
-      site_before <- haplotype[site_start:site_end, , drop = FALSE]
-      
-      site_current <- as.numeric(site_current)
-      
-      if (nrow(site_before) == 0 || is.null(nrow(site_before))) {
-        return(min(sizeBias, i))
-      }
-      
-      cor_results <- apply(site_before, 1, function(x) {
-        r <- cor(x, site_current)
-        if (is.na(r)) return(0)
-        return(r^2)
+    if (.Platform$OS.type == "windows") {
+      cl <- parallel::makeCluster(n_workers)
+      on.exit(parallel::stopCluster(cl))
+      site_indices <- 2:num_site
+      results_list <- parallel::parLapply(cl, site_indices, function(i) {
+        site_start <- max(1, i - sizeMax)
+        site_end <- i - 1
+        site_current <- haplotype[i, , drop = TRUE]
+        site_before <- haplotype[site_start:site_end, , drop = FALSE]
+        site_current <- as.numeric(site_current)
+        if (nrow(site_before) == 0 || is.null(nrow(site_before))) {
+          return(min(sizeBias, i))
+        }
+        cor_results <- apply(site_before, 1, function(x) {
+          r <- cor(x, site_current)
+          if (is.na(r)) return(0)
+          return(r^2)
+        })
+        temp_count <- sum(cor_results >= thresHold, na.rm = TRUE)
+        return(min(temp_count + sizeBias, i))
       })
-      
-      temp_count <- sum(cor_results >= thresHold, na.rm = TRUE)
-      return(min(temp_count + sizeBias, i))
+    } else {
+      site_indices <- 2:num_site
+      cor_func <- function(i) {
+        site_start <- max(1, i - sizeMax)
+        site_end <- i - 1
+        site_current <- haplotype[i, , drop = TRUE]
+        site_before <- haplotype[site_start:site_end, , drop = FALSE]
+        site_current <- as.numeric(site_current)
+        if (nrow(site_before) == 0 || is.null(nrow(site_before))) {
+          return(min(sizeBias, i))
+        }
+        cor_results <- apply(site_before, 1, function(x) {
+          r <- cor(x, site_current)
+          if (is.na(r)) return(0)
+          return(r^2)
+        })
+        temp_count <- sum(cor_results >= thresHold, na.rm = TRUE)
+        return(min(temp_count + sizeBias, i))
+      }
+      results_list <- parallel::mclapply(site_indices, cor_func, mc.cores = n_workers)
     }
-    
-    results_list <- parallel::mclapply(site_indices, cor_func, mc.cores = n_workers)
     
     for (k in seq_along(site_indices)) {
       result[site_indices[k], 1] <- results_list[[k]]

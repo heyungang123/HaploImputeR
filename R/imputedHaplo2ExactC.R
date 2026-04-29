@@ -37,6 +37,7 @@
 #' \code{\link{probComputationM}} for generating probability matrices\cr
 #' \code{\link{haploSeeds}} which uses this function
 #'
+#' @importFrom stats runif
 #' @export
 #'
 #' @examples
