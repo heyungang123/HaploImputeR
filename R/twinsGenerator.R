@@ -89,7 +89,7 @@ twinsGenerator <- function(haplotype_ref, count_alleles_obj, seed_size, batch_si
   count_alleles_obj <- .validateInput(count_alleles_obj, "count_alleles_obj", FALSE)
   
   num_sites <- nrow(count_alleles_obj)
-  num_chr <- ncol(haplotype_ref)
+  num_chr_target <- sum(count_alleles_obj[1, ])
   
   if (seed_size > num_sites) {
     stop("seed_size cannot exceed number of sites in count_alleles_obj")
@@ -104,7 +104,7 @@ twinsGenerator <- function(haplotype_ref, count_alleles_obj, seed_size, batch_si
     stop("prior_window_size must be positive")
   }
   
-  result <- matrix(0, nrow = num_sites, ncol = num_chr)
+  result <- matrix(0, nrow = num_sites, ncol = num_chr_target)
   
   seed_haplotypes <- haploSeeds(haplotype_ref[1:seed_size, ], 
                                 count_alleles_obj[1:seed_size, ],

@@ -1,6 +1,6 @@
 test_that("twinsGenerator validates seed_size", {
   hap_ref <- matrix(sample(0:1, 1000, replace = TRUE), nrow = 100)
-  count_obj <- matrix(c(50, 50), nrow = 100, ncol = 2)
+  count_obj <- matrix(c(5, 5), nrow = 100, ncol = 2)
   
   expect_error(twinsGenerator(hap_ref, count_obj, seed_size = 200, batch_size = 2, prior_window_size = 50), 
                "cannot exceed")
@@ -10,7 +10,7 @@ test_that("twinsGenerator validates seed_size", {
 
 test_that("twinsGenerator validates batch_size", {
   hap_ref <- matrix(sample(0:1, 1000, replace = TRUE), nrow = 100)
-  count_obj <- matrix(c(50, 50), nrow = 100, ncol = 2)
+  count_obj <- matrix(c(5, 5), nrow = 100, ncol = 2)
   
   expect_error(twinsGenerator(hap_ref, count_obj, seed_size = 10, batch_size = 0, prior_window_size = 50), 
                "must be positive")
@@ -20,7 +20,7 @@ test_that("twinsGenerator validates batch_size", {
 
 test_that("twinsGenerator reproducibility with seed", {
   hap_ref <- matrix(sample(0:1, 1000, replace = TRUE), nrow = 100)
-  count_obj <- matrix(c(50, 50), nrow = 100, ncol = 2)
+  count_obj <- matrix(c(5, 5), nrow = 100, ncol = 2)
   
   result1 <- twinsGenerator(hap_ref, count_obj, seed_size = 10, batch_size = 2, 
                             prior_window_size = 50, seed = 42, verbose = FALSE)
@@ -31,7 +31,7 @@ test_that("twinsGenerator reproducibility with seed", {
 
 test_that("twinsGenerator returns correct dimensions", {
   hap_ref <- matrix(sample(0:1, 1000, replace = TRUE), nrow = 100)
-  count_obj <- matrix(c(50, 50), nrow = 100, ncol = 2)
+  count_obj <- matrix(c(5, 5), nrow = 100, ncol = 2)
   
   result <- twinsGenerator(hap_ref, count_obj, seed_size = 10, batch_size = 2, 
                            prior_window_size = 50, verbose = FALSE)
